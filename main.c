@@ -5,7 +5,18 @@ int main(int argc,char**argv)
 	char buf[4096];
 	char res[4096];
 	char res2[4096];
+	char command[4096];
 	char *p;
+	
+	strcpy(command,"");
+	if (argc>1){
+		int i;
+		for(i=1; i<argc; ++i) {
+			strcat(command," ");
+			strcat(command,argv[i]);
+		}
+	}
+	puts(command);
 
 	sprintf(buf,"%s",argv[0]);
 	p=buf;
@@ -21,7 +32,7 @@ int main(int argc,char**argv)
 
 	if(!(buf[0]=='\\'&&buf[1]=='\\'))
 	{
-		sprintf(res,"\"%s\\Tools\\run.hta\"",buf);
+		sprintf(res,"\"%s\\Tools\\run.hta\"%s",buf,command);
 		printf(res);
 		ShellExecute(0,"open","Tools\\mshta.exe",res,0,SW_SHOWNORMAL);
 		return 0;
