@@ -1,13 +1,46 @@
 #include <stdio.h>
 #include <windows.h>
+
 int main(int argc,char**argv)
 {
-	char buf[4096];
 	char res[4096];
 	char res2[4096];
 	char command[4096];
-	char *p;
+	char mshta[MAX_PATH];
+	char curdir[MAX_PATH];
+	char curdirBin[MAX_PATH];
+	int i;
+	int last;
+	char s[MAX_PATH];
 	
+	SetEnvironmentVariable("SEE_MASK_NOZONECHECKS","1");
+	
+	//Путь до mshta.exe
+	GetWindowsDirectory(mshta, MAX_PATH);
+	sprintf(mshta,"%s\\System32\\mshta.exe",mshta);
+	printf("mshtaPath: %s\n", mshta);
+	
+	
+	//Полный путь до нашего EXE
+	if (GetModuleFileName(NULL, s, sizeof(s) / sizeof(*s)) > 0)
+	printf("GetModuleFileName=%s\n", s);
+	
+	
+	//Находим последнее вхождение символа \ чтобы обрезать имя EXE
+	last=sizeof(s);
+	for (i=0; s[i]!='\0'; i++){
+		if (s[i]=='\\'){ last = i; }
+	}
+	//printf("indexOf: %d\n", last);
+	
+	
+	//Обрезаем имя EXE, чтобы получить именно текущую директорию
+	strncpy(curdir,s,last);
+	printf("curdir=%s\n", curdir);
+	
+	
+	
+	//Собираем все параметры полученные через командную строку
 	strcpy(command,"");
 	if (argc>1){
 		int i;
@@ -18,34 +51,40 @@ int main(int argc,char**argv)
 	}
 	puts(command);
 
-	sprintf(buf,"%s",argv[0]);
-	p=buf;
-	while(*p)p++;
-	while(*p!='\\'&&p!=buf)p--;
-	*p=0;
 	
-	sprintf(buf,"%s\\bin",buf);
-	printf(buf);
-	SetCurrentDirectory(buf);
-	GetCurrentDirectory(4096,buf);
-	printf("(%s)",buf);
-
-	if(!(buf[0]=='\\'&&buf[1]=='\\'))
+	
+	//Устанавливаем текущую директорию
+	sprintf(curdirBin,"%s\\bin",curdir);
+	SetCurrentDirectory(curdirBin);
+	printf("curdirBin: %s\n",curdirBin);
+	
+	//Собираем параметры, которые будем передавать в mshta.exe
+	sprintf(res,"\"%s\\Tools\\run.hta\"%s",curdirBin,command);
+	
+	//Если запускаем не через SMB, а локально
+	if(!(curdirBin[0]=='\\'&&curdirBin[1]=='\\'))
 	{
-		sprintf(res,"\"%s\\Tools\\run.hta\"%s",buf,command);
-		printf(res);
-		ShellExecute(0,"open","Tools\\mshta.exe",res,0,SW_SHOWNORMAL);
+		//Запускаем HTA-приложение
+		ShellExecute(0,"open",mshta,res,0,SW_SHOWNORMAL);
+		printf("Executed: %s %s\n",mshta,res);
 		return 0;
 	}
-
-	sprintf(res,"\"%s\\Tools\\run.hta\"",buf);
+	
+	
+	//Подключаем сетевой диск
+	SetCurrentDirectory(curdir);
 	system("NET USE \"Z:\" /DELETE /YES");
-	sprintf(res2,"SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION & FOR /F \"tokens=2\" \%\%D IN ('NET USE * \"%s\" /PERSISTENT:NO^|FINDSTR /I 'unidad') DO SET DRIVELETTER=\%\%D",buf);
+	sprintf(res2,"SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION & FOR /F \"tokens=2\" \%\%D IN ('NET USE * \"%s\" /PERSISTENT:NO^|FINDSTR /I 'unidad') DO SET DRIVELETTER=\%\%D",curdir);
+	printf("NetUse: %s\n",res2);
 	system(res2);
-	printf(res2);
-
-	SetEnvironmentVariable("SEE_MASK_NOZONECHECKS","1");
-	SetCurrentDirectory("Z:\\");
-	ShellExecute(0,"open","Z:\\Tools\\mshta.exe","Z:\\Tools\\run.hta",0,SW_SHOWNORMAL);
+	
+	
+	//Запускаем HTA-приложение
+	SetCurrentDirectory("Z:\\bin\\");
+	ShellExecute(0,"open",mshta,res,0,SW_SHOWNORMAL);
+	printf("Executed: %s %s\n",mshta,res);
 	return 0;
 }
+
+
+

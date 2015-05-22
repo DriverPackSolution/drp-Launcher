@@ -7,10 +7,10 @@ BEGIN
   BEGIN
 	BLOCK "040904E4"
 	BEGIN
-	  VALUE "FileDescription", "Installs and updates drivers"
+	  VALUE "FileDescription", "Software and Drivers"
 	  VALUE "FileVersion", "1.0"
 	  VALUE "InternalName", "DPS"
-	  VALUE "OriginalFilename", "DriverPack Solution.exe"
+	  VALUE "OriginalFilename", "DriverPackSolution.exe"
 	  VALUE "ProductName", "DriverPack Solution"
 	  VALUE "ProductVersion", ""
 	END
