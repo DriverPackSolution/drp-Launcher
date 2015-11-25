@@ -47,7 +47,9 @@ int main(int argc,char**argv)
 		int i;
 		for(i=1; i<argc; ++i) {
 			wcscat(command,L" ");
+			wcscat(command,L"\"");
 			wcscat(command,arglist[i]);
+			wcscat(command,L"\"");
 		}
 	}
 	_putws(command);
