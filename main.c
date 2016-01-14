@@ -57,12 +57,12 @@ int main(int argc,char**argv)
 
 
 	//Устанавливаем текущую директорию
-	wsprintf(curdirBin,L"%s\\bin",curdir);
+	wsprintf(curdirBin,L"%s"_CURR_DIR_,curdir);
 	SetCurrentDirectory(curdirBin);
 	wprintf(L"curdirBin: %s\n",curdirBin);
 
 	//Собираем параметры, которые будем передавать в mshta.exe
-	wsprintf(res,L"\"%s\\Tools\\run.hta\"%s",curdirBin,command);
+	wsprintf(res,L"\"%s"_HTA_PATH_"\"%s",curdirBin,command);
 
 	//Если запускаем не через SMB, а локально
 	if(!(curdirBin[0]=='\\'&&curdirBin[1]=='\\'))
@@ -83,7 +83,7 @@ int main(int argc,char**argv)
 
 
 	//Запускаем HTA-приложение
-	SetCurrentDirectory(L"Z:\\bin\\");
+	SetCurrentDirectory(L"Z:"_CURR_DIR_"\\");
 	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
 	wprintf(L"Executed: %s %s\n",mshta,res);
 	return 0;
