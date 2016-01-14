@@ -11,7 +11,7 @@ HINSTANCE ShellExecuteSync(HWND hwnd, LPCTSTR lpVerb, LPCTSTR lpFile, LPCTSTR lp
 {
 	SHELLEXECUTEINFO ShExecInfo = {0};
 	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI | SEE_MASK_NO_CONSOLE;
 	ShExecInfo.hwnd = hwnd;
 	ShExecInfo.lpVerb = lpVerb;
 	ShExecInfo.lpFile = lpFile;
