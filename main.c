@@ -27,7 +27,7 @@ HINSTANCE ShellExecuteSync(HWND hwnd, LPCTSTR lpVerb, LPCTSTR lpFile, LPCTSTR lp
 
 void run(WCHAR* mshta, WCHAR* res)
 {
-	ShellExecuteSync(0,L"open",L"init.cmd",res,0,SW_HIDE);
+	ShellExecuteSync(0,L"open",L"Tools\\init.cmd",res,0,SW_HIDE);
 	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
 	wprintf(L"Executed: %s %s\n",mshta,res);
 }
