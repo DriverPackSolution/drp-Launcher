@@ -7,6 +7,12 @@
 
 #define _O_U16TEXT  0x20000
 
+void run(WCHAR* mshta, WCHAR* res)
+{
+	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
+	wprintf(L"Executed: %s %s\n",mshta,res);
+}
+
 int main(int argc,char**argv)
 {
 	WCHAR res[4096];
@@ -68,8 +74,7 @@ int main(int argc,char**argv)
 	if(!(curdirBin[0]=='\\'&&curdirBin[1]=='\\'))
 	{
 		//Запускаем HTA-приложение
-		ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
-		wprintf(L"Executed: %s %s\n",mshta,res);
+		run(mshta, res);
 		return 0;
 	}
 
@@ -84,9 +89,6 @@ int main(int argc,char**argv)
 
 	//Запускаем HTA-приложение
 	SetCurrentDirectory(L"Z:"_CURR_DIR_"\\");
-	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
-	wprintf(L"Executed: %s %s\n",mshta,res);
+	run(mshta, res);
 	return 0;
 }
-
-
