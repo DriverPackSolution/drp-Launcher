@@ -7,8 +7,27 @@
 
 #define _O_U16TEXT  0x20000
 
+HINSTANCE ShellExecuteSync(HWND hwnd, LPCTSTR lpVerb, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow)
+{
+	SHELLEXECUTEINFO ShExecInfo = {0};
+	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+	ShExecInfo.hwnd = hwnd;
+	ShExecInfo.lpVerb = lpVerb;
+	ShExecInfo.lpFile = lpFile;
+	ShExecInfo.lpParameters = lpParameters;
+	ShExecInfo.lpDirectory = lpDirectory;
+	ShExecInfo.nShow = nShow;
+	ShExecInfo.hInstApp = NULL;
+	ShellExecuteEx(&ShExecInfo);
+	WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+	CloseHandle(ShExecInfo.hProcess);
+	return ShExecInfo.hInstApp;
+}
+
 void run(WCHAR* mshta, WCHAR* res)
 {
+	ShellExecuteSync(0,L"open",L"init.cmd",res,0,SW_HIDE);
 	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
 	wprintf(L"Executed: %s %s\n",mshta,res);
 }
