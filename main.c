@@ -7,6 +7,31 @@
 
 #define _O_U16TEXT  0x20000
 
+HINSTANCE ShellExecuteSync(HWND hwnd, LPCTSTR lpVerb, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShow)
+{
+	SHELLEXECUTEINFO ShExecInfo = {0};
+	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI | SEE_MASK_NO_CONSOLE;
+	ShExecInfo.hwnd = hwnd;
+	ShExecInfo.lpVerb = lpVerb;
+	ShExecInfo.lpFile = lpFile;
+	ShExecInfo.lpParameters = lpParameters;
+	ShExecInfo.lpDirectory = lpDirectory;
+	ShExecInfo.nShow = nShow;
+	ShExecInfo.hInstApp = NULL;
+	ShellExecuteEx(&ShExecInfo);
+	WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+	CloseHandle(ShExecInfo.hProcess);
+	return ShExecInfo.hInstApp;
+}
+
+void run(WCHAR* mshta, WCHAR* res)
+{
+	ShellExecuteSync(0,L"open",L"Tools\\init.cmd",res,0,SW_HIDE);
+	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
+	wprintf(L"Executed: %s %s\n",mshta,res);
+}
+
 int main(int argc,char**argv)
 {
 	WCHAR res[4096];
@@ -57,19 +82,18 @@ int main(int argc,char**argv)
 
 
 	//Устанавливаем текущую директорию
-	wsprintf(curdirBin,L"%s\\bin",curdir);
+	wsprintf(curdirBin,L"%s"_CURR_DIR_,curdir);
 	SetCurrentDirectory(curdirBin);
 	wprintf(L"curdirBin: %s\n",curdirBin);
 
 	//Собираем параметры, которые будем передавать в mshta.exe
-	wsprintf(res,L"\"%s\\Tools\\run.hta\"%s",curdirBin,command);
+	wsprintf(res,L"\"%s"_HTA_PATH_"\"%s",curdirBin,command);
 
 	//Если запускаем не через SMB, а локально
 	if(!(curdirBin[0]=='\\'&&curdirBin[1]=='\\'))
 	{
 		//Запускаем HTA-приложение
-		ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
-		wprintf(L"Executed: %s %s\n",mshta,res);
+		run(mshta, res);
 		return 0;
 	}
 
@@ -83,10 +107,7 @@ int main(int argc,char**argv)
 
 
 	//Запускаем HTA-приложение
-	SetCurrentDirectory(L"Z:\\bin\\");
-	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
-	wprintf(L"Executed: %s %s\n",mshta,res);
+	SetCurrentDirectory(L"Z:"_CURR_DIR_"\\");
+	run(mshta, res);
 	return 0;
 }
-
-
