@@ -27,7 +27,18 @@ HINSTANCE ShellExecuteSync(HWND hwnd, LPCTSTR lpVerb, LPCTSTR lpFile, LPCTSTR lp
 
 void run(WCHAR* mshta, WCHAR* res)
 {
-	ShellExecuteSync(0,L"open",L"Tools\\init.cmd",res,0,SW_HIDE);
+	WCHAR cmd[MAX_PATH];
+	WCHAR init[MAX_PATH];
+
+	//Путь до cmd.exe
+	GetWindowsDirectory(cmd, MAX_PATH);
+	wsprintf(cmd,L"%s\\System32\\cmd.exe", cmd);
+
+	//Скрипт инициализации
+	wsprintf(init,L"/c Tools\\init.cmd %s",res);
+
+	ShellExecuteSync(0,L"open",cmd,init,0,SW_HIDE);
+	wprintf(L"Executed: %s %s\n",cmd,init);
 	ShellExecute(0,L"open",mshta,res,0,SW_SHOWNORMAL);
 	wprintf(L"Executed: %s %s\n",mshta,res);
 }
