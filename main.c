@@ -30,7 +30,7 @@ void run(WCHAR* mshta, WCHAR* res)
 {
 	WCHAR cmd[MAX_PATH];
 	WCHAR init[MAX_PATH];
-	WCHAR failover[MAX_PATH];
+	WCHAR onexit[MAX_PATH];
 
 	//Путь до cmd.exe
 	GetWindowsDirectory(cmd, MAX_PATH);
@@ -39,12 +39,12 @@ void run(WCHAR* mshta, WCHAR* res)
 	//Скрипт инициализации
 	wsprintf(init,L"/c Tools\\init.cmd %s",res);
 
-	//failover-скрипт
-	wsprintf(failover,L"/c Tools\\failover.cmd %s",res);
+	//onexit-скрипт
+	wsprintf(onexit,L"/c Tools\\onexit.cmd %s",res);
 
 	ShellExecuteSync(0,L"open",cmd,init,0,SW_HIDE);
 	ShellExecuteSync(0,L"open",mshta,res,0,SW_SHOWNORMAL);
-	ShellExecuteSync(0,L"open",cmd,failover,0,SW_HIDE);
+	ShellExecuteSync(0,L"open",cmd,onexit,0,SW_HIDE);
 }
 
 int main(int argc,char**argv)
